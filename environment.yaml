@@ -1,0 +1,18 @@
+name: linkedin-assistant
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - streamlit
+  - pydantic
+  - requests
+  - python-dotenv
+  - numpy
+  - pandas
+  - matplotlib
+  - pytest
+  - pip:
+      - langchain
+      - langgraph

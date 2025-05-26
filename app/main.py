@@ -2,7 +2,7 @@ import uuid
 import json
 from backend.orchestrator.state_schema import ProfileBotState
 from backend.orchestrator.langgraph_graph import get_graph_runner
-from app.ui_utils import get_mock_profile
+from linkedin.mock_profiles import get_mock_profile
 
 class SimpleLinkedInGenieTerminal:
     def __init__(self):
@@ -112,7 +112,7 @@ class SimpleLinkedInGenieTerminal:
                 break
             if "linkedin.com/in/" in user_input:
                 self.state.linkedin_url = user_input
-                self.state.linkedin_data = get_mock_profile()
+                self.state.linkedin_data = get_mock_profile(linkedin_url=self.state.linkedin_url)
             self.state.user_input = user_input
             self.state.conversation_history.append({"role": "user", "content": user_input})
             updated_state_dict = self.graph_runner.invoke(
