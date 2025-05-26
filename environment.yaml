@@ -16,3 +16,4 @@ dependencies:
   - pip:
       - langchain
       - langgraph
+      - langchain-google-genai

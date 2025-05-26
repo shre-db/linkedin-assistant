@@ -13,3 +13,6 @@
 *.zip
 *.tar
 *.tar.gz
+
+# Do not ignore the .png image inside the docs directory
+!docs/*.png
