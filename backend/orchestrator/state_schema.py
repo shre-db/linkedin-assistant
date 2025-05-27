@@ -54,6 +54,14 @@ class ProfileBotState(BaseModel):
     proposed_next_action: Optional[str] = Field(None, description="The action suggested by the bot (e.g., 'rewrite' after analysis) that needs user confirmation.")
     current_task_status: Optional[str] = Field(None, description="Brief status message about ongoing task (e.g., 'Analyzing profile...', 'Generating rewrites...').")
     awaiting_job_description: bool = Field(False, description="Flag: True if bot explicitly asked for a job description and is awaiting it.")
+    
+    # 4a. Completion Tracking & Re-execution Control
+    analysis_completed: bool = Field(False, description="Flag: True if profile analysis has been completed at least once.")
+    rewrite_completed: bool = Field(False, description="Flag: True if content rewriting has been completed at least once.")
+    job_fit_completed: bool = Field(False, description="Flag: True if job fit evaluation has been completed at least once.")
+    guidance_completed: bool = Field(False, description="Flag: True if career guidance has been provided at least once.")
+    allow_re_execution: bool = Field(True, description="Flag: True if user wants to allow re-running of completed tasks. Set to False to prevent loops.")
+    user_requested_update: bool = Field(False, description="Flag: True if user explicitly requested to update/redo a completed task.")
 
     # 5. Error/Debugging Information
     error_message: Optional[str] = Field(None, description="Stores any error messages encountered during processing.")

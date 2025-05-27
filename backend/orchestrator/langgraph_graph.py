@@ -34,10 +34,10 @@ def build_graph():
         }
     )
 
-    graph.add_edge("AnalyzeProfile", "Router")
-    graph.add_edge("RewriteContent", "Router")
-    graph.add_edge("EvaluateJobFit", "Router")
-    graph.add_edge("CareerGuidance", "Router")
+    graph.add_edge("AnalyzeProfile", END)
+    graph.add_edge("RewriteContent", END) 
+    graph.add_edge("EvaluateJobFit", END)
+    graph.add_edge("CareerGuidance", END)
 
     return graph
 

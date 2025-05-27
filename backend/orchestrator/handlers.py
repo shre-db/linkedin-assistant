@@ -54,6 +54,9 @@ def router_node(state: ProfileBotState) -> ProfileBotState:
                     state.last_agent_called = None
                 else:
                     state.last_agent_called = last_agent_value
+            # Handle new re-execution control flags
+            if "user_requested_update" in routing_response:
+                state.user_requested_update = routing_response["user_requested_update"]
         if (state.current_router_action == "CALL_JOB_FIT" and 
             current_user_input_for_turn and 
             not state.target_job_description):
@@ -94,9 +97,19 @@ def analyze_node(state: ProfileBotState) -> ProfileBotState:
         result = analyzer.analyze(state.linkedin_data)
         state.profile_analysis_report = result
         state.is_profile_analyzed = True
+        state.analysis_completed = True  # Set completion flag
         state.last_agent_called = "analyze"
         state.current_task_status = "Profile analysis completed"
-        state.current_bot_response = "I've completed analyzing your LinkedIn profile. Would you like me to suggest content improvements or evaluate job fit?"
+        
+        # Check if this was an update request BEFORE resetting the flag
+        is_update_request = state.user_requested_update
+        state.user_requested_update = False  # Reset update flag after checking
+        
+        # Provide different responses based on whether this is an update or first-time analysis
+        if is_update_request:
+            state.current_bot_response = "I've updated your profile analysis with fresh insights. Would you like to proceed with content suggestions or job fit evaluation?"
+        else:
+            state.current_bot_response = "I've completed analyzing your LinkedIn profile. Would you like me to suggest content improvements or evaluate job fit?"
         return state
     except ValueError as e:
         state.error_message = f"Analysis error: {str(e)}"
@@ -123,9 +136,19 @@ def rewrite_node(state: ProfileBotState) -> ProfileBotState:
             target_role=state.target_role
         )
         state.content_rewrites_suggestions = result
+        state.rewrite_completed = True  # Set completion flag
         state.last_agent_called = "rewrite"
         state.current_task_status = "Content rewrite suggestions generated"
-        state.current_bot_response = "I've generated optimized content suggestions for your LinkedIn profile. Would you like me to provide career guidance or evaluate job fit next?"
+        
+        # Check if this was an update request BEFORE resetting the flag
+        is_update_request = state.user_requested_update
+        state.user_requested_update = False  # Reset update flag after checking
+        
+        # Provide different responses based on whether this is an update or first-time rewrite
+        if is_update_request:
+            state.current_bot_response = "I've generated fresh content alternatives for your LinkedIn profile. Would you like me to provide career guidance or evaluate job fit next?"
+        else:
+            state.current_bot_response = "I've generated optimized content suggestions for your LinkedIn profile. Would you like me to provide career guidance or evaluate job fit next?"
         return state
     except ValueError as e:
         state.error_message = f"Rewriting error: {str(e)}"
@@ -158,10 +181,20 @@ def job_fit_node(state: ProfileBotState) -> ProfileBotState:
             job_description=state.target_job_description
         )
         state.job_fit_evaluation_report = result
+        state.job_fit_completed = True  # Set completion flag
         state.last_agent_called = "job_fit"
         state.current_task_status = "Job fit evaluation completed"
         state.awaiting_job_description = False
-        state.current_bot_response = "I've completed the job fit evaluation. Would you like career guidance based on these results?"
+        
+        # Check if this was an update request BEFORE resetting the flag
+        is_update_request = state.user_requested_update
+        state.user_requested_update = False  # Reset update flag after checking
+        
+        # Provide different responses based on whether this is an update or first-time evaluation
+        if is_update_request:
+            state.current_bot_response = "I've updated the job fit evaluation with fresh analysis. Would you like career guidance based on these results?"
+        else:
+            state.current_bot_response = "I've completed the job fit evaluation. Would you like career guidance based on these results?"
         return state
     except ValueError as e:
         state.error_message = f"Job fit error: {str(e)}"
@@ -188,6 +221,8 @@ def guide_node(state: ProfileBotState) -> ProfileBotState:
             target_role=state.target_role or "your desired role"
         )
         state.career_guidance_notes = result
+        state.guidance_completed = True  # Set completion flag
+        state.user_requested_update = False  # Reset update flag after execution
         state.last_agent_called = "guide"
         state.current_task_status = "Career guidance provided"
         state.current_bot_response = "I've provided personalized career guidance. Is there anything specific you'd like to explore further?"
